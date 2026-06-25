@@ -1,0 +1,9 @@
+.git
+.gitignore
+data/
+results/
+logs/
+resources/
+*.pdf
+*.log
+README.md

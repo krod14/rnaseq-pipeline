@@ -1,0 +1,36 @@
+# ─────────────────────────────────────────
+# Master Snakefile
+# ─────────────────────────────────────────
+# Snakemake works backwards from the final
+# target defined in rule all. It will figure
+# out every step needed to produce it.
+# ─────────────────────────────────────────
+
+configfile: "config/config.yaml"
+
+# Pull sample IDs from config
+SAMPLES = list(config["samples"].keys())
+
+# Include all rule modules
+include: "rules/index.smk"
+include: "rules/qc.smk"
+include: "rules/trim.smk"
+include: "rules/align.smk"
+include: "rules/quantify.smk"
+include: "rules/diffexp.smk"
+
+# ─────────────────────────────────────────
+# rule all: defines the final targets
+# Snakemake will trace backwards from these
+# to determine what needs to run
+# ─────────────────────────────────────────
+rule all:
+    input:
+        # QC reports for each sample
+        expand("results/qc/{sample}_fastqc.html", sample=SAMPLES),
+        # MultiQC summary across all samples
+        "results/qc/multiqc_report.html",
+        # Final DESeq2 results table
+        "results/diffexp/deseq2_results.csv",
+        # Normalized counts for the Shiny dashboard
+        "results/diffexp/normalized_counts.csv"

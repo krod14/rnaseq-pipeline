@@ -1,0 +1,83 @@
+# ─────────────────────────────────────────
+# RNA-seq Pipeline Configuration
+# ─────────────────────────────────────────
+# Update the paths below to match your
+# HPC cluster or cloud environment before
+# running the pipeline.
+# ─────────────────────────────────────────
+
+# Sample information
+# Format: {GSM_accession}: "{condition}"
+samples:
+  GSM461177: "untreated"
+  GSM461178: "untreated"
+  GSM461180: "treated"
+  GSM461181: "treated"
+
+# SRR runs per sample
+# Used for documentation purposes only.
+# FASTQs are expected to already be staged
+# in the raw_data directory on your cluster.
+sra:
+  GSM461177:
+    - SRR031714
+    - SRR031715
+  GSM461178:
+    - SRR031716
+    - SRR031717
+  GSM461180:
+    - SRR031724
+    - SRR031725
+  GSM461181:
+    - SRR031726
+    - SRR031727
+
+# ─────────────────────────────────────────
+# Reference Genome
+# Genome: Drosophila melanogaster dm6
+# Source: Ensembl release 109
+#
+# Update these paths to point to your
+# cluster's shared reference directory.
+# If star_index does not exist at the
+# specified path, the pipeline will build
+# it automatically via index.smk.
+# ─────────────────────────────────────────
+reference:
+  genome_fasta: "/path/to/shared/references/dm6/dm6.fa"
+  gtf: "/path/to/shared/references/dm6/dm6.gtf"
+  star_index: "/path/to/shared/references/dm6/star_index/"
+
+# ─────────────────────────────────────────
+# Paths
+# Update these to match your project
+# directory structure on the cluster.
+# ─────────────────────────────────────────
+paths:
+  raw_data: "/path/to/project/data/raw/"
+  trimmed: "/path/to/project/data/trimmed/"
+  aligned: "/path/to/project/data/aligned/"
+  counts: "/path/to/project/data/counts/"
+  results: "/path/to/project/results/"
+  logs: "/path/to/project/logs/"
+
+# ─────────────────────────────────────────
+# Tool Parameters
+# Adjust these based on your data and
+# analysis requirements.
+# ─────────────────────────────────────────
+params:
+  trimmomatic:
+    leading: 3
+    trailing: 3
+    slidingwindow: "4:15"
+    minlen: 36
+  star:
+    threads: 4
+    outSAMtype: "BAM SortedByCoordinate"
+  featurecounts:
+    threads: 4
+    strandedness: 0
+  deseq2:
+    fdr_threshold: 0.05
+    lfc_threshold: 1
