@@ -222,3 +222,4 @@ results/**
 logs/**
 resources/genome/*.fa
 resources/genome/*.gtf
+.snakemake/
