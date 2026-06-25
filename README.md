@@ -14,7 +14,7 @@ environment by updating a single configuration file.
 ## Pipeline Overview
 
 ```
-Raw FASTQs → FastQC/MultiQC → Trimmomatic → STAR → featureCounts → DESeq2 → Shiny Dashboard
+Raw FASTQs → STAR Index → FastQC/MultiQC → Trimmomatic → STAR → featureCounts → DESeq2 → Shiny Dashboard
 ```
 
 | Step | Tool | Purpose |
@@ -56,13 +56,16 @@ rnaseq-pipeline/
 │   ├── app.R
 │   └── global.R
 ├── docs/
-│   └── data_dictionary.md          # Input/output documentation
+│   ├── data_dictionary.md          # Input/output documentation
+│   └── aws_deployment.md           # AWS EC2/S3 deployment guide
 └── Dockerfile                      # Containerized pipeline environment
 ```
 
 ---
 
 ## Quickstart
+
+For deployment on AWS EC2, see the [AWS Deployment Guide](docs/aws_deployment.md).
 
 ### Step 1: Clone the repository
 
@@ -212,6 +215,11 @@ cat data/raw/SRR031714_1.fastq data/raw/SRR031715_1.fastq | gzip > data/raw/GSM4
 cat data/raw/SRR031714_2.fastq data/raw/SRR031715_2.fastq | gzip > data/raw/GSM461177_R2.fastq.gz
 ```
 
+The above example shows GSM461177 only. Repeat for GSM461178, GSM461180,
+and GSM461181 using their respective SRR accessions from the table above.
+For complete step-by-step download instructions for all four samples, see the
+[AWS Deployment Guide](docs/aws_deployment.md).
+
 ---
 
 ## Shiny Dashboard
@@ -239,6 +247,13 @@ docker run -v $(pwd)/data:/pipeline/data \
            -v $(pwd)/resources:/pipeline/resources \
            rnaseq-pipeline
 ```
+
+This pipeline was validated end-to-end on AWS EC2 (`r5.xlarge`, 4 vCPUs,
+32GB RAM) using the four paired-end samples and dm6 reference genome. 
+All 17 pipeline steps completed successfully, producing
+FastQC reports, a MultiQC summary, DESeq2 differential expression results,
+and visualization outputs. See [docs/aws_deployment.md](docs/aws_deployment.md)
+for full deployment instructions.
 
 ---
 

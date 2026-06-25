@@ -13,8 +13,10 @@ comments in that file for parameter descriptions.
 ## Setup
 
 Before running the pipeline, update `config/config.yaml` with your
-HPC cluster or cloud environment paths. There are three sections to
-configure:
+HPC cluster or cloud environment paths. For full deployment instructions
+on AWS EC2, see [docs/aws_deployment.md](aws_deployment.md).
+
+There are three sections to configure:
 
 **1. Reference genome paths**
 On most HPC clusters, reference genomes are maintained centrally in a
@@ -112,7 +114,7 @@ Building from scratch requires ~16GB RAM and approximately 20-30 minutes.
 ## Outputs
 
 ### QC Reports
-**Location:** `config["paths"]["results"]qc/`
+**Location:** `config["paths"]["results"]/qc/`
 
 | File | Description |
 |------|-------------|
@@ -121,7 +123,7 @@ Building from scratch requires ~16GB RAM and approximately 20-30 minutes.
 | `multiqc_report.html` | Aggregated QC report across all samples and pipeline stages |
 
 ### Differential Expression
-**Location:** `config["paths"]["results"]diffexp/`
+**Location:** `config["paths"]["results"]/diffexp/`
 
 | File | Description |
 |------|-------------|
@@ -147,11 +149,25 @@ Building from scratch requires ~16GB RAM and approximately 20-30 minutes.
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `gene_id` | string | Gene identifier from GTF annotation |
+| `gene_id` | string | Ensembl/FlyBase gene identifier (e.g. FBgn0000490) |
 | `GSM461177` | float | VST-normalized count for untreated replicate 1 |
 | `GSM461178` | float | VST-normalized count for untreated replicate 2 |
 | `GSM461180` | float | VST-normalized count for treated replicate 1 |
 | `GSM461181` | float | VST-normalized count for treated replicate 2 |
+
+---
+
+### Shiny Dashboard
+**Location:** `dashboard/`
+**Inputs:** `deseq2_results.csv` and `normalized_counts.csv`
+**Launch:** `shiny::runApp("dashboard/")` in R or RStudio
+
+| Tab | Description |
+|-----|-------------|
+| Overview | Summary statistics and PCA plot |
+| Volcano Plot | Interactive, filterable by FDR and fold change |
+| Heatmap | Top N most variable genes with adjustable scaling |
+| Results Table | Full DESeq2 output with column filtering and sorting |
 
 ---
 
