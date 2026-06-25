@@ -36,9 +36,9 @@ colnames(counts) <- colnames(counts) %>%
 # ── Build sample metadata ──────────────────
 # Read condition labels from config
 sample_info <- data.frame(
-    sample    = colnames(counts),
     condition = unlist(snakemake@config[["samples"]])
-) %>% column_to_rownames("sample")
+)
+rownames(sample_info) <- colnames(counts)
 
 # ── Run DESeq2 ─────────────────────────────
 dds <- DESeqDataSetFromMatrix(
