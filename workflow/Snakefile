@@ -26,8 +26,9 @@ include: "rules/diffexp.smk"
 # ─────────────────────────────────────────
 rule all:
     input:
-        # QC reports for each sample
-        expand("results/qc/{sample}_fastqc.html", sample=SAMPLES),
+        # QC reports for each sample (R1 and R2 separately)
+        expand("results/qc/{sample}_R1_fastqc.html", sample=SAMPLES),
+        expand("results/qc/{sample}_R2_fastqc.html", sample=SAMPLES),
         # MultiQC summary across all samples
         "results/qc/multiqc_report.html",
         # Final DESeq2 results table

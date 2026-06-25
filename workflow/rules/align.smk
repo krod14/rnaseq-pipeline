@@ -20,7 +20,7 @@ rule star_align:
         bam = config["paths"]["aligned"] + "{sample}/Aligned.sortedByCoord.out.bam",
         log_final = config["paths"]["aligned"] + "{sample}/Log.final.out"
     conda:
-        "../envs/align.yaml"
+        "../../envs/align.yaml"
     log:
         "logs/star/{sample}.log"
     params:

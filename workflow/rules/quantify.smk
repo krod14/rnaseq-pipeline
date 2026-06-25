@@ -23,7 +23,7 @@ rule featurecounts:
         counts    = config["paths"]["counts"] + "counts.txt",
         counts_summary = config["paths"]["counts"] + "counts.txt.summary"
     conda:
-        "../envs/quantify.yaml"
+        "../../envs/quantify.yaml"
     log:
         "logs/featurecounts/featurecounts.log"
     params:

@@ -23,7 +23,7 @@ rule deseq2:
         volcano    = "results/diffexp/volcano_plot.pdf",
         heatmap    = "results/diffexp/heatmap.pdf"
     conda:
-        "../envs/diffexp.yaml"
+        "../../envs/diffexp.yaml"
     log:
         "logs/deseq2/deseq2.log"
     params:

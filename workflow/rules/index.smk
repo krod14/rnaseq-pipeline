@@ -39,7 +39,7 @@ rule star_index:
     output:
         directory(config["reference"]["star_index"])
     conda:
-        "../envs/align.yaml"
+        "../../envs/align.yaml"
     log:
         "logs/star_index/star_index.log"
     threads: 8

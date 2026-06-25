@@ -21,7 +21,7 @@ rule trimmomatic:
         r1_unpaired = config["paths"]["trimmed"] + "{sample}_R1_unpaired.fastq.gz",
         r2_unpaired = config["paths"]["trimmed"] + "{sample}_R2_unpaired.fastq.gz"
     conda:
-        "../envs/trim.yaml"
+        "../../envs/trim.yaml"
     log:
         "logs/trimmomatic/{sample}.log"
     params:

@@ -18,7 +18,7 @@ rule fastqc:
         zip_r1  = "results/qc/{sample}_R1_fastqc.zip",
         zip_r2  = "results/qc/{sample}_R2_fastqc.zip"
     conda:
-        "../envs/qc.yaml"
+        "../../envs/qc.yaml"
     log:
         "logs/fastqc/{sample}.log"
     shell:
@@ -40,7 +40,7 @@ rule multiqc:
     output:
         "results/qc/multiqc_report.html"
     conda:
-        "../envs/qc.yaml"
+        "../../envs/qc.yaml"
     log:
         "logs/multiqc/multiqc.log"
     shell:
