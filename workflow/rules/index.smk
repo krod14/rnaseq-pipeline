@@ -37,7 +37,8 @@ rule star_index:
         fasta = config["reference"]["genome_fasta"],
         gtf   = config["reference"]["gtf"]
     output:
-        directory(config["reference"]["star_index"])
+        dir    = directory(config["reference"]["star_index"]),
+        params = config["reference"]["star_index"] + "genomeParameters.txt"
     conda:
         "../../envs/align.yaml"
     log:
