@@ -46,12 +46,12 @@ rule star_index:
     threads: 8
     shell:
         """
-        mkdir -p {output}
+        mkdir -p {output.dir}
 
         STAR \
             --runMode genomeGenerate \
             --runThreadN {threads} \
-            --genomeDir {output} \
+            --genomeDir {output.dir} \
             --genomeFastaFiles {input.fasta} \
             --sjdbGTFfile {input.gtf} \
             --genomeSAindexNbases 12 \
