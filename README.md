@@ -29,6 +29,11 @@ Raw FASTQs → STAR Index → FastQC/MultiQC → Trimmomatic → STAR → featur
 
 ---
 
+## Live Dashboard
+
+An interactive version of the results dashboard is available at:
+**[https://krod14.shinyapps.io/rnaseq-pasilla/](https://krod14.shinyapps.io/rnaseq-pasilla/)**
+
 ## Repository Structure
 
 ```
@@ -54,7 +59,10 @@ rnaseq-pipeline/
 │   └── diffexp.yaml
 ├── dashboard/                      # R/Shiny interactive results dashboard
 │   ├── app.R
-│   └── global.R
+│   ├── global.R
+│   └── data/                       # Pre-computed results for dashboard
+│       ├── deseq2_results.csv
+│       └── normalized_counts.csv
 ├── docs/
 │   ├── data_dictionary.md          # Input/output documentation
 │   └── aws_deployment.md           # AWS EC2/S3 deployment guide
@@ -224,12 +232,19 @@ For complete step-by-step download instructions for all four samples, see the
 
 ## Shiny Dashboard
 
-The interactive dashboard provides four views of the DESeq2 results:
+An interactive dashboard for exploring the DESeq2 results is available at:
+**[https://krod14.shinyapps.io/rnaseq-pasilla/](https://krod14.shinyapps.io/rnaseq-pasilla/)**
 
-- **Overview** — summary statistics and PCA plot for sample QC
+The dashboard provides five views of the results:
+
+- **Overview** — summary statistics, biological context, and top differentially expressed genes
+- **PCA** — sample clustering by condition; use to assess replicate consistency
 - **Volcano Plot** — interactive, filterable by FDR and fold change cutoffs
 - **Heatmap** — top N most variable genes with adjustable scaling
-- **Results Table** — full DESeq2 output with column filtering and sorting
+- **Results Table** — full DESeq2 output with column filtering, sorting, and scientific notation p-values
+
+The dashboard is built with R/Shiny and deployed on shinyapps.io. Source code
+is in `dashboard/` and pre-computed results are in `dashboard/data/`.
 
 ---
 
