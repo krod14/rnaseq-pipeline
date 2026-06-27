@@ -13,6 +13,7 @@ library(DESeq2)
 library(EnhancedVolcano)
 library(tidyverse)
 library(pheatmap)
+library(org.Dm.eg.db)
 
 # ── Load count matrix ──────────────────────
 # featureCounts output has 6 metadata columns
@@ -77,7 +78,14 @@ write.csv(res_df,
 # visualization (not for DE testing)
 vst_counts <- vst(dds, blind = FALSE)
 norm_df <- assay(vst_counts) %>%
-    as.data.frame() %>%
+    as.data.frame()
+
+# Clean column names before writing to CSV
+colnames(norm_df) <- colnames(norm_df) %>%
+    basename() %>%
+    str_remove("_Aligned.sortedByCoord.out.bam")
+
+norm_df <- norm_df %>%
     rownames_to_column("gene_id")
 
 write.csv(norm_df,
@@ -97,21 +105,58 @@ pca_var <- round(100 * attr(pca_data, "percentVar"))
 pdf(snakemake@output[["pca_plot"]])
 ggplot(pca_data, aes(PC1, PC2, color = condition)) +
     geom_point(size = 4) +
+    geom_text_repel(aes(label = rownames(pca_data)),
+                    size = 3, show.legend = FALSE,
+                    box.padding = 0.5,
+                    point.padding = 0.3) +
     xlab(paste0("PC1: ", pca_var[1], "% variance")) +
     ylab(paste0("PC2: ", pca_var[2], "% variance")) +
     theme_minimal() +
-    ggtitle("PCA of VST-normalized counts")
+    ggtitle("PCA of VST-normalized counts") +
+    labs(color = "Condition") +
+    guides(color = guide_legend(override.aes = list(label = "")))
 dev.off()
 
 # Volcano plot: visualizes DE results
+
+# Gene symbol mapping
+res_df$gene_symbol <- mapIds(
+    org.Dm.eg.db,
+    keys      = res_df$gene_id,
+    column    = "SYMBOL",
+    keytype   = "FLYBASE",
+    multiVals = "first"
+)
+
+res_df$label <- ifelse(
+    is.na(res_df$gene_symbol),
+    res_df$gene_id,
+    res_df$gene_symbol
+)
+
+# Label only top 10 most significant genes with abs(log2FC) > 2
+# Always include ps (pasilla) since it is the gene of interest
+top_labels <- res_df %>%
+    filter(!is.na(padj),
+           padj < snakemake@params[["fdr_threshold"]],
+           abs(log2FoldChange) > 2) %>%
+    slice_min(padj, n = 10) %>%
+    pull(label)
+
+top_labels <- unique(c(top_labels, "ps"))
+
 pdf(snakemake@output[["volcano"]])
 EnhancedVolcano(res_df,
-    lab    = res_df$gene_id,
-    x      = "log2FoldChange",
-    y      = "padj",
-    pCutoff = snakemake@params[["fdr_threshold"]],
-    FCcutoff = snakemake@params[["lfc_threshold"]],
-    title  = "Treated vs Untreated"
+    lab             = res_df$label,
+    selectLab       = top_labels,
+    x               = "log2FoldChange",
+    y               = "padj",
+    pCutoff         = snakemake@params[["fdr_threshold"]],
+    FCcutoff        = snakemake@params[["lfc_threshold"]],
+    title           = "Treated vs Untreated",
+    subtitle        = "Pasilla knockdown — Drosophila melanogaster",
+    drawConnectors  = TRUE,
+    widthConnectors = 0.5
 )
 dev.off()
 
@@ -119,12 +164,25 @@ dev.off()
 top_genes <- order(rowVars(assay(vst_counts)),
     decreasing = TRUE)[1:50]
 
+heatmap_mat <- assay(vst_counts)[top_genes, ]
+
+# Map FBgn row names to gene symbols
+rownames(heatmap_mat) <- mapIds(
+    org.Dm.eg.db,
+    keys      = rownames(heatmap_mat),
+    column    = "SYMBOL",
+    keytype   = "FLYBASE",
+    multiVals = "first"
+) %>% ifelse(is.na(.), rownames(heatmap_mat), .)
+
 pdf(snakemake@output[["heatmap"]])
 pheatmap(
-    assay(vst_counts)[top_genes, ],
+    heatmap_mat,
     annotation_col = sample_info,
     show_rownames  = TRUE,
-    scale          = "row"
+    fontsize_row   = 8,
+    scale          = "row",
+    angle_col      = 45
 )
 dev.off()
 

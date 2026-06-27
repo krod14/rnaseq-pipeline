@@ -21,23 +21,39 @@ There are three sections to configure:
 **1. Reference genome paths**
 On most HPC clusters, reference genomes are maintained centrally in a
 shared directory accessible to all users (e.g. `/scratch/shared/references/`).
-Point the `reference` section of `config.yaml` to your cluster's dm6
-FASTA, GTF, and STAR index paths.
+Point the `reference` section of `config.yaml` to your cluster's or
+cloud environment's dm6 FASTA, GTF, and STAR index paths.
 
-If these files are not available on your cluster, download them from
-Ensembl release 109:
+If these files are not available on your cluster or cloud instance,
+download them from Ensembl release 109:
 - [dm6 FASTA](https://ftp.ensembl.org/pub/release-109/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.32.dna.toplevel.fa.gz)
 - [dm6 GTF](https://ftp.ensembl.org/pub/release-109/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.32.109.gtf.gz)
 
+On AWS EC2, download directly to your instance:
+```bash
+wget https://ftp.ensembl.org/pub/release-109/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.32.dna.toplevel.fa.gz \
+    -O resources/genome/dm6.fa.gz && gunzip resources/genome/dm6.fa.gz
+
+wget https://ftp.ensembl.org/pub/release-109/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.32.109.gtf.gz \
+    -O resources/genome/dm6.gtf.gz && gunzip resources/genome/dm6.gtf.gz
+```
+
 **2. STAR index path**
-If a pre-built dm6 STAR index exists on your cluster, point
-`star_index` to it and the index rule will be skipped automatically.
-Otherwise the pipeline builds it on first run (~16GB RAM, ~20-30 min).
+If a pre-built dm6 STAR index exists on your cluster or cloud environment,
+point `star_index` to it. The pipeline checks for
+`genomeParameters.txt` inside that directory — if it exists, the index
+rule is skipped automatically. If the directory is empty or does not
+exist, the index will be built on first run (~16GB RAM, ~20-30 min).
+On AWS EC2, sync a built index to S3 for reuse across future runs:
+```bash
+aws s3 sync resources/star_index/ s3://your-bucket/references/star_index/
+```
 
 **3. Project data paths**
 Point `raw_data` to the directory containing your staged FASTQ files.
 All other paths (`trimmed`, `aligned`, `counts`, `results`, `logs`)
-should point to writable project directories on the cluster.
+should point to writable project directories on your cluster or cloud
+instance. On AWS EC2, these will typically be under `/home/ubuntu/rnaseq-pipeline/`.
 
 ---
 
@@ -68,11 +84,15 @@ before running the pipeline
 
 ### STAR Index
 **Location:** `config["reference"]["star_index"]`
-**Built by:** `workflow/rules/index.smk` — only if index does not
-already exist at the configured path
+**Built by:** `workflow/rules/index.smk` — only if
+`resources/star_index/genomeParameters.txt` does not exist at the
+configured path. The pipeline checks for this specific file rather than
+just the directory, so an empty directory will still trigger a build.
 **Note:** On HPC clusters a pre-built index is often available in a
-shared reference directory. If so, the index rule is skipped automatically.
-Building from scratch requires ~16GB RAM and approximately 20-30 minutes.
+shared reference directory — point `star_index` to it and the rule is
+skipped automatically. On cloud environments like AWS EC2, the index
+will typically need to be built on first run (~16GB RAM, ~20-30 minutes).
+Results can then be synced to S3 for reuse across future runs.
 
 ---
 

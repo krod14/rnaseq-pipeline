@@ -6,14 +6,16 @@
 # IMPORTANT: On most HPC clusters and cloud
 # environments, a pre-built STAR index is
 # already available in a shared reference
-# directory. If the path specified in
-# config["reference"]["star_index"] already
-# exists, Snakemake will skip this rule
-# automatically.
+# directory. If so, point star_index to it
+# in config.yaml and this rule will be
+# skipped automatically.
 #
-# Only runs if the index directory is missing
-# at the configured path. In that case,
-# ensure you have:
+# The pipeline checks for genomeParameters.txt
+# inside the star_index directory to determine
+# if the index needs to be built. An empty
+# directory will still trigger a build.
+#
+# If building from scratch, ensure you have:
 #   ~16GB RAM
 #   ~20-30 minutes
 # ─────────────────────────────────────────
@@ -23,9 +25,11 @@ rule star_index:
     Build STAR genome index from the dm6
     reference FASTA and GTF annotation.
 
-    Skipped automatically if the index
-    already exists at the path specified
-    in config["reference"]["star_index"].
+    Skipped automatically if
+    genomeParameters.txt already exists
+    inside the configured star_index path.
+    An empty directory will still trigger
+    a build.
 
     --genomeSAindexNbases 12 is required
     for small genomes like Drosophila dm6.

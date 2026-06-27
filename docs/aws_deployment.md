@@ -2,7 +2,7 @@
 
 This document describes how to deploy and run the RNA-seq pipeline
 on AWS using EC2 for compute and S3 for storage. This is the
-recommended approach for full dataset (4 samples, paired-end) execution, 
+recommended approach for dataset (4 samples, paired-end) execution, 
 as the pipeline requires ~16GB RAM for STAR index building and alignment.
 
 ---
@@ -259,8 +259,12 @@ conda install -c conda-forge -c bioconda sra-tools -y
 ```
 
 **STAR index not building:**
-- Ensure `resources/star_index/` directory does not already exist
-- If it does, remove it: `rm -rf resources/star_index/`
+- The pipeline checks for `resources/star_index/genomeParameters.txt`
+  to determine if the index needs to be built
+- If the directory exists but is empty, the pipeline will build the
+  index automatically
+- If you need to force a rebuild, remove the directory:
+  `rm -rf resources/star_index/`
 
 ---
 

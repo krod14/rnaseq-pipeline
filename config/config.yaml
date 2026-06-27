@@ -17,7 +17,8 @@ samples:
 # SRR runs per sample
 # Used for documentation purposes only.
 # FASTQs are expected to already be staged
-# in the raw_data directory on your cluster.
+# in the raw_data directory on your cluster
+# or cloud environment.
 sra:
   GSM461177:
     - SRR031714
@@ -38,10 +39,11 @@ sra:
 # Source: Ensembl release 109
 #
 # Update these paths to point to your
-# cluster's shared reference directory.
-# If star_index does not exist at the
-# specified path, the pipeline will build
-# it automatically via index.smk.
+# cluster or cloud environment's shared 
+# reference directory. If star_index does 
+# not exist at the specified path, the 
+# pipeline will build it automatically via 
+# index.smk.
 # ─────────────────────────────────────────
 reference:
   genome_fasta: "/path/to/shared/references/dm6/dm6.fa"
@@ -51,7 +53,8 @@ reference:
 # ─────────────────────────────────────────
 # Paths
 # Update these to match your project
-# directory structure on the cluster.
+# directory structure on the cluster 
+# or cloud environment.
 # ─────────────────────────────────────────
 paths:
   raw_data: "/path/to/project/data/raw/"

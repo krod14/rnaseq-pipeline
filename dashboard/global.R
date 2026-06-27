@@ -10,6 +10,7 @@ library(plotly)
 library(pheatmap)
 library(DT)
 library(shinydashboard)
+library(org.Dm.eg.db)
 
 # ── Load pipeline outputs ──────────────────
 # These CSVs are produced by the DESeq2 rule
