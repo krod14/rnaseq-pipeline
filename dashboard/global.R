@@ -13,13 +13,15 @@ library(shinydashboard)
 library(org.Dm.eg.db)
 
 # ── Load pipeline outputs ──────────────────
-# These CSVs are produced by the DESeq2 rule
+# Pre-computed CSVs from the DESeq2 pipeline rule
+# Stored in dashboard/data/ for local development
+# and shinyapps.io deployment
 deseq2_results <- read.csv(
-    "../results/diffexp/deseq2_results.csv"
+    "data/deseq2_results.csv"
 )
 
 normalized_counts <- read.csv(
-    "../results/diffexp/normalized_counts.csv",
+    "data/normalized_counts.csv",
     row.names = 1
 )
 
@@ -30,6 +32,25 @@ sig_genes <- deseq2_results %>%
 
 # Top 50 most variable genes for heatmap
 top_variable <- normalized_counts %>%
+    dplyr::select(starts_with("GSM")) %>%
     mutate(variance = apply(across(everything()), 1, var)) %>%
     arrange(desc(variance)) %>%
-    slice_head(n = 50)
+    slice_head(n = 50) %>%
+    dplyr::select(-variance)
+
+# ── Gene symbol mapping ────────────────────
+# Map FlyBase IDs to readable gene symbols
+# Available app-wide for all visualizations
+deseq2_results$gene_symbol <- mapIds(
+    org.Dm.eg.db,
+    keys      = deseq2_results$gene_id,
+    column    = "SYMBOL",
+    keytype   = "FLYBASE",
+    multiVals = "first"
+)
+
+deseq2_results$label <- ifelse(
+    is.na(deseq2_results$gene_symbol),
+    deseq2_results$gene_id,
+    deseq2_results$gene_symbol
+)
