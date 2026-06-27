@@ -96,11 +96,23 @@ bash Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
 ```
 
+**Accept conda Terms of Service:**
+```bash
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+```
+
 **Create Snakemake environment:**
 ```bash
 conda create -n snakemake -c conda-forge -c bioconda snakemake=8.30.0 python=3.11 -y
 conda activate snakemake
 ```
+
+**Set strict channel priority:**
+```bash
+conda config --set channel_priority strict
+```
+This ensures conda resolves packages consistently across channels, preventing version conflicts. Required by Snakemake.
 
 **Configure AWS CLI:**
 ```bash
@@ -192,7 +204,7 @@ Always use tmux to protect against SSH disconnections:
 
 ```bash
 tmux new -s pipeline
-conda activate rnaseq-pipeline
+conda activate snakemake
 snakemake --cores 4 --use-conda
 ```
 
