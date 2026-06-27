@@ -173,6 +173,9 @@ heatmap_mat <- assay(vst_counts)[top_genes, ]
 colnames(heatmap_mat) <- colnames(heatmap_mat) %>%
     str_extract("GSM[0-9]+")
 
+# Ensure sample_info rownames match cleaned column names
+rownames(sample_info) <- colnames(heatmap_mat)
+
 # Map FBgn row names to gene symbols
 rownames(heatmap_mat) <- mapIds(
     org.Dm.eg.db,
