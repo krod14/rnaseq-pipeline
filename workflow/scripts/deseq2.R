@@ -27,7 +27,7 @@ counts_raw <- read.table(
 
 # Drop metadata columns, keep only count columns
 counts <- counts_raw %>%
-    select(-Chr, -Start, -End, -Strand, -Length)
+    dplyr::select(-Chr, -Start, -End, -Strand, -Length)
 
 # Clean up sample names (featureCounts uses full BAM paths)
 colnames(counts) <- colnames(counts) %>%
