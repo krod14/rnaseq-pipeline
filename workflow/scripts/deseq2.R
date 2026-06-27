@@ -101,8 +101,7 @@ norm_df <- assay(vst_counts) %>%
 
 # Clean column names before writing to CSV
 colnames(norm_df) <- colnames(norm_df) %>%
-    basename() %>%
-    str_remove("_Aligned.sortedByCoord.out.bam")
+    str_extract("GSM[0-9]+")
 
 norm_df <- norm_df %>%
     rownames_to_column("gene_id")
