@@ -10,6 +10,12 @@ library(plotly)
 library(pheatmap)
 library(DT)
 library(shinydashboard)
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+if (!requireNamespace("org.Dm.eg.db", quietly = TRUE))
+    BiocManager::install("org.Dm.eg.db")
+
 library(org.Dm.eg.db)
 
 # Prevent AnnotationDbi from masking dplyr::select and dplyr::rename
