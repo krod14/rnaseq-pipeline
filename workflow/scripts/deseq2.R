@@ -169,6 +169,10 @@ top_genes <- order(rowVars(assay(vst_counts)),
 
 heatmap_mat <- assay(vst_counts)[top_genes, ]
 
+# Clean column names
+colnames(heatmap_mat) <- colnames(heatmap_mat) %>%
+    str_extract("GSM[0-9]+")
+
 # Map FBgn row names to gene symbols
 rownames(heatmap_mat) <- mapIds(
     org.Dm.eg.db,
