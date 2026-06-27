@@ -15,6 +15,9 @@ library(tidyverse)
 library(pheatmap)
 library(org.Dm.eg.db)
 
+# Prevent AnnotationDbi from masking dplyr::select
+select <- dplyr::select
+
 # ── Load count matrix ──────────────────────
 # featureCounts output has 6 metadata columns
 # before the actual counts begin
@@ -63,11 +66,27 @@ res <- results(
     lfcThreshold = snakemake@params[["lfc_threshold"]]
 )
 
-# Convert to dataframe and save
+# Convert to dataframe
 res_df <- as.data.frame(res) %>%
     rownames_to_column("gene_id") %>%
     arrange(padj)
 
+# Gene symbol mapping
+res_df$gene_symbol <- mapIds(
+    org.Dm.eg.db,
+    keys      = res_df$gene_id,
+    column    = "SYMBOL",
+    keytype   = "FLYBASE",
+    multiVals = "first"
+)
+
+res_df$label <- ifelse(
+    is.na(res_df$gene_symbol),
+    res_df$gene_id,
+    res_df$gene_symbol
+)
+
+# Save results with gene symbols
 write.csv(res_df,
     snakemake@output[["results"]],
     row.names = FALSE
@@ -118,21 +137,6 @@ ggplot(pca_data, aes(PC1, PC2, color = condition)) +
 dev.off()
 
 # Volcano plot: visualizes DE results
-
-# Gene symbol mapping
-res_df$gene_symbol <- mapIds(
-    org.Dm.eg.db,
-    keys      = res_df$gene_id,
-    column    = "SYMBOL",
-    keytype   = "FLYBASE",
-    multiVals = "first"
-)
-
-res_df$label <- ifelse(
-    is.na(res_df$gene_symbol),
-    res_df$gene_id,
-    res_df$gene_symbol
-)
 
 # Label only top 10 most significant genes with abs(log2FC) > 2
 # Always include ps (pasilla) since it is the gene of interest
