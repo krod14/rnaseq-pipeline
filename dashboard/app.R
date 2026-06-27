@@ -6,6 +6,10 @@
 
 source("global.R")
 
+# Prevent AnnotationDbi from masking dplyr::select and dplyr::rename
+select <- dplyr::select
+rename <- dplyr::rename
+
 # ── UI ─────────────────────────────────────
 ui <- dashboardPage(
     dashboardHeader(title = "RNA-seq Results"),
@@ -251,8 +255,12 @@ server <- function(input, output, session) {
     # ── PCA plot ───────────────────────────
     output$pca_plot <- renderPlotly({
         pca_mat <- normalized_counts %>%
-            dplyr::select(starts_with("GSM")) %>%
-            t()
+          dplyr::select(starts_with("GSM")) %>%
+          mutate(variance = apply(across(everything()), 1, var)) %>%
+          arrange(desc(variance)) %>%
+          slice_head(n = 500) %>%
+          dplyr::select(-variance) %>%
+          t()
 
         pca_result <- prcomp(pca_mat, scale. = TRUE)
         pca_data <- as.data.frame(pca_result$x[, 1:2])
