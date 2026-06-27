@@ -96,12 +96,14 @@ write.csv(res_df,
 # Variance stabilizing transformation for
 # visualization (not for DE testing)
 vst_counts <- vst(dds, blind = FALSE)
+
+# Clean column names once here — applies to all downstream uses
+# (PCA, heatmap, normalized counts CSV)
+colnames(vst_counts) <- colnames(vst_counts) %>%
+    str_extract("GSM[0-9]+")
+
 norm_df <- assay(vst_counts) %>%
     as.data.frame()
-
-# Clean column names before writing to CSV
-colnames(norm_df) <- colnames(norm_df) %>%
-    str_extract("GSM[0-9]+")
 
 norm_df <- norm_df %>%
     rownames_to_column("gene_id")
@@ -157,7 +159,7 @@ EnhancedVolcano(res_df,
     pCutoff         = snakemake@params[["fdr_threshold"]],
     FCcutoff        = snakemake@params[["lfc_threshold"]],
     title           = "Treated vs Untreated",
-    subtitle        = "Pasilla knockdown — Drosophila melanogaster",
+    subtitle        = "Drosophila melanogaster Pasilla knockdown ",
     drawConnectors  = TRUE,
     widthConnectors = 0.5
 )
@@ -168,10 +170,6 @@ top_genes <- order(rowVars(assay(vst_counts)),
     decreasing = TRUE)[1:50]
 
 heatmap_mat <- assay(vst_counts)[top_genes, ]
-
-# Clean column names
-colnames(heatmap_mat) <- colnames(heatmap_mat) %>%
-    str_extract("GSM[0-9]+")
 
 # Ensure sample_info rownames match cleaned column names
 rownames(sample_info) <- colnames(heatmap_mat)
