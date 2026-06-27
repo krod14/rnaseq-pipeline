@@ -179,15 +179,17 @@ Results can then be synced to S3 for reuse across future runs.
 
 ### Shiny Dashboard
 **Location:** `dashboard/`
-**Inputs:** `deseq2_results.csv` and `normalized_counts.csv`
-**Launch:** `shiny::runApp("dashboard/")` in R or RStudio
+**Live URL:** [https://krod14.shinyapps.io/rnaseq-pasilla/](https://krod14.shinyapps.io/rnaseq-pasilla/)
+**Inputs:** `dashboard/data/deseq2_results.csv` and `dashboard/data/normalized_counts.csv`
+**Launch locally:** `shiny::runApp("dashboard/")` in R or RStudio
 
 | Tab | Description |
 |-----|-------------|
-| Overview | Summary statistics and PCA plot |
-| Volcano Plot | Interactive, filterable by FDR and fold change |
-| Heatmap | Top N most variable genes with adjustable scaling |
-| Results Table | Full DESeq2 output with column filtering and sorting |
+| Overview | Summary statistics, biological context, and top differentially expressed genes |
+| PCA | Sample clustering by condition; assess replicate consistency |
+| Volcano Plot | Interactive, filterable by FDR and fold change cutoffs |
+| Heatmap | Top N most variable genes with adjustable scaling and gene symbol labels |
+| Results Table | Full DESeq2 output with column filtering, sorting, and scientific notation p-values |
 
 ---
 
