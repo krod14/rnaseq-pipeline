@@ -223,3 +223,4 @@ logs/**
 resources/genome/*.fa
 resources/genome/*.gtf
 .snakemake/resources/star_index/
+dashboard/rsconnect/
